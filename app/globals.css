@@ -3,69 +3,127 @@
 @tailwind utilities;
 
 :root {
-  --carimo-black: #0d0d0d;
-  --carimo-ink: #171717;
-  --carimo-muted: #6d6962;
-  --carimo-gold: #c9a64e;
-  --carimo-gold-dark: #9a761f;
-  --carimo-magenta: #d1007f;
-  --carimo-magenta-dark: #a90067;
-  --carimo-ivory: #fbfaf7;
-  --carimo-sand: #f3efe7;
-  --carimo-border: #e7e0d4;
+  --ink: #15110e;
+  --ink-soft: #2b241f;
+  --muted: #756c63;
+  --gold: #bea05b;
+  --gold-light: #ead7a0;
+  --gold-dark: #876a2e;
+  --rose: #bd176f;
+  --rose-deep: #8f0d50;
+  --rose-soft: #fff5fa;
+  --ivory: #fbf8f2;
+  --cream: #f4eee4;
+  --line: #e7ded2;
+  --shadow-suite: 0 28px 80px rgba(38, 27, 18, .10), 0 6px 20px rgba(38, 27, 18, .05);
+  --carimo-black: var(--ink);
+  --carimo-ink: var(--ink);
+  --carimo-muted: var(--muted);
+  --carimo-gold: var(--gold);
+  --carimo-gold-dark: var(--gold-dark);
+  --carimo-magenta: var(--rose);
+  --carimo-magenta-dark: var(--rose-deep);
+  --carimo-ivory: var(--ivory);
+  --carimo-sand: var(--cream);
+  --carimo-border: var(--line);
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  color: var(--carimo-ink);
+  color: var(--ink);
   background:
-    linear-gradient(180deg, rgba(201,166,78,.055), transparent 22rem),
-    var(--carimo-ivory);
+    radial-gradient(circle at 8% 4%, rgba(190,160,91,.10), transparent 24rem),
+    radial-gradient(circle at 94% 16%, rgba(189,23,111,.045), transparent 28rem),
+    linear-gradient(180deg, #fffdf9 0%, var(--ivory) 48%, #f8f2e9 100%);
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .23;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
 }
 button, input { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
-::selection { color: white; background: var(--carimo-magenta); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--rose); outline-offset: 4px; }
+::selection { color: white; background: var(--rose); }
 
 .glass {
-  background: rgba(255,255,255,.96);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(231,224,212,.96);
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(231,222,210,.92);
 }
-
 .mesh {
   background-image:
-    linear-gradient(rgba(201,166,78,.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,166,78,.09) 1px, transparent 1px);
-  background-size: 34px 34px;
+    radial-gradient(circle at 50% 20%, rgba(234,215,160,.18), transparent 28%),
+    linear-gradient(rgba(190,160,91,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(190,160,91,.06) 1px, transparent 1px);
+  background-size: auto, 36px 36px, 36px 36px;
 }
-
 .brand-product-grid {
   background-image:
-    radial-gradient(circle at 18% 15%, rgba(201,166,78,.17), transparent 12rem),
-    linear-gradient(rgba(13,13,13,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13,13,13,.025) 1px, transparent 1px);
-  background-size: auto, 28px 28px, 28px 28px;
+    radial-gradient(circle at 18% 15%, rgba(190,160,91,.18), transparent 12rem),
+    linear-gradient(rgba(21,17,14,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21,17,14,.022) 1px, transparent 1px);
+  background-size: auto, 30px 30px, 30px 30px;
 }
-
 .gold-text {
-  color: #b88b29;
-  background-image: linear-gradient(110deg, #875d0b 0%, #d7bd6f 48%, #9a6d14 100%);
+  color: #a88134;
+  background-image: linear-gradient(110deg,#7a581c 0%,#dfc77f 48%,#8d6725 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-.carimo-rule {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,166,78,.9), transparent);
+.carimo-rule { height: 1px; background: linear-gradient(90deg,transparent,rgba(190,160,91,.95),transparent); }
+.scan-line { animation: scan 2.6s cubic-bezier(.4,0,.2,1) infinite; }
+@keyframes scan {
+  0%,100% { transform: translateY(-72px); opacity:.12; }
+  50% { transform: translateY(82px); opacity:.92; }
 }
 
-.scan-line { animation: scan 2.2s ease-in-out infinite; }
-@keyframes scan {
-  0%,100% { transform: translateY(-70px); opacity:.16; }
-  50% { transform: translateY(80px); opacity:.95; }
+/* Premium interaction layer — applies to existing CARIMO controls without changing business logic. */
+button[class*="bg-[#d1007f]"], a[class*="bg-[#d1007f]"] {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(110deg, var(--rose-deep), var(--rose) 48%, #ce3b89) !important;
+  box-shadow: 0 14px 34px rgba(189,23,111,.22);
+  transition: transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease, filter .45s ease;
+}
+button[class*="bg-[#d1007f]"]:hover, a[class*="bg-[#d1007f]"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(189,23,111,.30);
+  filter: saturate(1.06);
+}
+button[class*="border-[#0d0d0d]"], a[class*="border-[#0d0d0d]"] {
+  transition: transform .4s cubic-bezier(.22,1,.36,1), background-color .4s ease, color .4s ease, box-shadow .4s ease;
+}
+button[class*="border-[#0d0d0d]"]:hover, a[class*="border-[#0d0d0d]"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(21,17,14,.10);
+}
+.shadow-luxury {
+  box-shadow: var(--shadow-suite) !important;
+}
+section[class*="border"], main > div[class*="border"] {
+  transition: border-color .35s ease, box-shadow .5s ease, transform .5s cubic-bezier(.22,1,.36,1);
+}
+.group[class*="border"][class*="bg-white"]:hover {
+  box-shadow: 0 24px 56px rgba(36,27,19,.11);
 }
 
 [dir='rtl'] .rtl-flip { transform: scaleX(-1); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
