@@ -1,20 +1,256 @@
 'use client';
 
-import {useMemo, useRef, useState, type ReactNode} from 'react';
+import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Camera,
+  Check,
+  ChevronDown,
+  CircleCheck,
+  Clock3,
+  Crown,
+  Droplets,
+  ExternalLink,
+  Eye,
+  Feather,
+  Gem,
+  Globe2,
+  Heart,
+  Leaf,
+  LoaderCircle,
+  LockKeyhole,
+  MoonStar,
+  ScanFace,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  SunMedium,
+  WandSparkles,
+  X
+} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import {usePathname, useRouter} from 'next/navigation';
-import {
-  ArrowLeft, ArrowRight, Camera, Check, ChevronDown, CircleCheck, Droplets,
-  Crown, ExternalLink, Globe2, Heart, LoaderCircle, LockKeyhole, ScanFace,
-  ShieldCheck, ShoppingBag, Sparkles, SunMedium, WandSparkles, X
-} from 'lucide-react';
-import {ProductVisual} from './product-visual';
+import {useEffect, useMemo, useRef, useState, type ReactNode} from 'react';
 import {recommend, type Answers} from '@/lib/recommendations';
 import type {Product} from '@/lib/products';
+import {ProductVisual} from './product-visual';
 
 const locales = ['en', 'ar', 'fr'] as const;
-type Locale = typeof locales[number];
-type Stage = 'landing' | 'consent' | 'capture' | 'questions' | 'analyzing' | 'results';
+type Locale = (typeof locales)[number];
+type Stage = 'welcome' | 'privacy' | 'portrait' | 'consultation' | 'atelier' | 'reveal';
+
+type Copy = {
+  privateSuite: string;
+  privateConsultation: string;
+  invitation: string;
+  appointmentNote: string;
+  start: string;
+  withoutPhoto: string;
+  signature: string;
+  signatureText: string;
+  calm: string;
+  calmText: string;
+  considered: string;
+  consideredText: string;
+  concierge: string;
+  conciergeText: string;
+  privacyEyebrow: string;
+  portraitEyebrow: string;
+  consultationEyebrow: string;
+  atelierEyebrow: string;
+  revealEyebrow: string;
+  session: string;
+  step: string;
+  secure: string;
+  portraitStudio: string;
+  portraitStudioText: string;
+  photoReady: string;
+  replacePhoto: string;
+  chooseAnswer: string;
+  atelierTitle: string;
+  atelierText: string;
+  curation: string;
+  profile: string;
+  profileText: string;
+  ritualIntro: string;
+  ritualDescription: string;
+  recommended: string;
+  chapter: string;
+  whySelected: string;
+  yourInvestment: string;
+  officialBoutique: string;
+  beginAgain: string;
+  privateGuidance: string;
+  cosmeticOnly: string;
+  explainable: string;
+  privilege: string;
+  privilegeText: string;
+  observed: string;
+  declared: string;
+  morning: string;
+  evening: string;
+  tailoredFor: string;
+};
+
+const copy: Record<Locale, Copy> = {
+  en: {
+    privateSuite: 'The CARIMO Private Suite',
+    privateConsultation: 'A private beauty consultation, curated around you.',
+    invitation: 'Enter a calm, confidential experience where your skin goals, climate and preferences become a considered CARIMO ritual.',
+    appointmentNote: 'Your private appointment takes less than two minutes.',
+    start: 'Begin my consultation',
+    withoutPhoto: 'Continue discreetly without a photo',
+    signature: 'A signature ritual',
+    signatureText: 'Every product has a clear place, purpose and reason to belong.',
+    calm: 'Calm by design',
+    calmText: 'One considered question at a time, with no unnecessary complexity.',
+    considered: 'Thoughtfully matched',
+    consideredText: 'Your routine reflects your beauty goals, environment and comfort.',
+    concierge: 'Private guidance',
+    conciergeText: 'A premium path from discovery to the official CARIMO boutique.',
+    privacyEyebrow: 'Your private suite',
+    portraitEyebrow: 'The portrait studio',
+    consultationEyebrow: 'Your beauty consultation',
+    atelierEyebrow: 'The CARIMO atelier',
+    revealEyebrow: 'Your private reveal',
+    session: 'Private session',
+    step: 'Step',
+    secure: 'Private and temporary',
+    portraitStudio: 'A natural portrait is all we need',
+    portraitStudioText: 'Soft, even light helps us create more considered cosmetic guidance. Your photo is not permanently stored.',
+    photoReady: 'Portrait ready for consultation',
+    replacePhoto: 'Replace portrait',
+    chooseAnswer: 'Choose the answer that feels most true today.',
+    atelierTitle: 'Your ritual is being curated',
+    atelierText: 'We are bringing together your preferences, environment and CARIMO product matches.',
+    curation: 'Private curation in progress',
+    profile: 'Your beauty profile',
+    profileText: 'A clear reading of what you shared and what the portrait can reasonably support.',
+    ritualIntro: 'Your CARIMO ritual',
+    ritualDescription: 'Choose the level of care that suits your rhythm. Each ritual remains coherent, explainable and shoppable.',
+    recommended: 'Recommended',
+    chapter: 'Ritual chapter',
+    whySelected: 'Why this belongs in your ritual',
+    yourInvestment: 'Your ritual investment',
+    officialBoutique: 'Continue to the official boutique',
+    beginAgain: 'Begin a new consultation',
+    privateGuidance: 'Private by design',
+    cosmeticOnly: 'Cosmetic guidance only',
+    explainable: 'Every match explained',
+    privilege: 'A privileged experience',
+    privilegeText: 'From the first question to the final ritual, every detail is designed to feel calm, personal and considered.',
+    observed: 'Observed from the portrait',
+    declared: 'Shared by you',
+    morning: 'Morning ritual',
+    evening: 'Evening ritual',
+    tailoredFor: 'Tailored for'
+  },
+  fr: {
+    privateSuite: 'La Suite Privée CARIMO',
+    privateConsultation: 'Une consultation beauté privée, entièrement pensée autour de vous.',
+    invitation: 'Entrez dans une expérience calme et confidentielle où vos objectifs, votre climat et vos préférences deviennent un rituel CARIMO cohérent.',
+    appointmentNote: 'Votre rendez-vous privé dure moins de deux minutes.',
+    start: 'Commencer ma consultation',
+    withoutPhoto: 'Continuer discrètement sans photo',
+    signature: 'Un rituel signature',
+    signatureText: 'Chaque produit possède une place, une fonction et une raison précise.',
+    calm: 'Une expérience apaisée',
+    calmText: 'Une seule question à la fois, sans complexité inutile.',
+    considered: 'Sélection réfléchie',
+    consideredText: 'Votre routine tient compte de vos objectifs, de votre environnement et de votre confort.',
+    concierge: 'Accompagnement privé',
+    conciergeText: 'Un parcours premium, de la découverte à la boutique officielle CARIMO.',
+    privacyEyebrow: 'Votre suite privée',
+    portraitEyebrow: 'Le studio portrait',
+    consultationEyebrow: 'Votre consultation beauté',
+    atelierEyebrow: 'L’atelier CARIMO',
+    revealEyebrow: 'Votre révélation privée',
+    session: 'Session privée',
+    step: 'Étape',
+    secure: 'Privé et temporaire',
+    portraitStudio: 'Un portrait naturel suffit',
+    portraitStudioText: 'Une lumière douce et uniforme permet de proposer des conseils cosmétiques plus réfléchis. Votre photo n’est pas conservée durablement.',
+    photoReady: 'Portrait prêt pour la consultation',
+    replacePhoto: 'Remplacer le portrait',
+    chooseAnswer: 'Choisissez la réponse qui vous correspond le mieux aujourd’hui.',
+    atelierTitle: 'Votre rituel est en cours de composition',
+    atelierText: 'Nous réunissons vos préférences, votre environnement et les correspondances produits CARIMO.',
+    curation: 'Sélection privée en cours',
+    profile: 'Votre profil beauté',
+    profileText: 'Une lecture claire de ce que vous avez partagé et de ce que le portrait peut raisonnablement suggérer.',
+    ritualIntro: 'Votre rituel CARIMO',
+    ritualDescription: 'Choisissez le niveau de soin adapté à votre rythme. Chaque rituel reste cohérent, expliqué et directement accessible.',
+    recommended: 'Recommandé',
+    chapter: 'Chapitre du rituel',
+    whySelected: 'Pourquoi ce soin appartient à votre rituel',
+    yourInvestment: 'Valeur de votre rituel',
+    officialBoutique: 'Continuer vers la boutique officielle',
+    beginAgain: 'Commencer une nouvelle consultation',
+    privateGuidance: 'Confidentialité intégrée',
+    cosmeticOnly: 'Conseils cosmétiques uniquement',
+    explainable: 'Chaque choix est expliqué',
+    privilege: 'Une expérience privilégiée',
+    privilegeText: 'De la première question au rituel final, chaque détail est conçu pour être calme, personnel et attentionné.',
+    observed: 'Observé à partir du portrait',
+    declared: 'Partagé par vous',
+    morning: 'Rituel du matin',
+    evening: 'Rituel du soir',
+    tailoredFor: 'Pensé pour'
+  },
+  ar: {
+    privateSuite: 'جناح CARIMO الخاص',
+    privateConsultation: 'استشارة جمال خاصة صُممت بالكامل من أجلك.',
+    invitation: 'ادخلي تجربة هادئة وسرية تتحول فيها أهدافك وبيئتك وتفضيلاتك إلى طقس عناية متكامل من CARIMO.',
+    appointmentNote: 'موعدك الخاص يستغرق أقل من دقيقتين.',
+    start: 'ابدئي استشارتي',
+    withoutPhoto: 'المتابعة بخصوصية من دون صورة',
+    signature: 'طقس عناية مميز',
+    signatureText: 'لكل منتج مكان واضح وهدف وسبب محدد ضمن روتينك.',
+    calm: 'هدوء في كل تفصيل',
+    calmText: 'سؤال واحد مدروس في كل خطوة، من دون تعقيد غير ضروري.',
+    considered: 'اختيار بعناية',
+    consideredText: 'يعكس روتينك أهدافك الجمالية وبيئتك وراحتك.',
+    concierge: 'إرشاد خاص',
+    conciergeText: 'مسار فاخر من الاكتشاف إلى متجر CARIMO الرسمي.',
+    privacyEyebrow: 'جناحك الخاص',
+    portraitEyebrow: 'استوديو الصورة',
+    consultationEyebrow: 'استشارتك الجمالية',
+    atelierEyebrow: 'مشغل CARIMO',
+    revealEyebrow: 'لحظة الكشف الخاصة',
+    session: 'جلسة خاصة',
+    step: 'الخطوة',
+    secure: 'خاص ومؤقت',
+    portraitStudio: 'كل ما نحتاجه هو صورة طبيعية',
+    portraitStudioText: 'تساعد الإضاءة الهادئة والمتوازنة على تقديم إرشاد تجميلي أكثر دقة. لا يتم الاحتفاظ بصورتك بشكل دائم.',
+    photoReady: 'الصورة جاهزة للاستشارة',
+    replacePhoto: 'استبدال الصورة',
+    chooseAnswer: 'اختاري الإجابة الأقرب إلى حالتك اليوم.',
+    atelierTitle: 'يتم الآن تنسيق طقس العناية الخاص بك',
+    atelierText: 'نجمع تفضيلاتك وبيئتك مع أفضل تطابقات منتجات CARIMO.',
+    curation: 'جاري التنسيق الخاص',
+    profile: 'ملف جمالك',
+    profileText: 'قراءة واضحة لما شاركته وما يمكن للصورة أن يدعمه بشكل معقول.',
+    ritualIntro: 'طقس CARIMO الخاص بك',
+    ritualDescription: 'اختاري مستوى العناية المناسب لإيقاع حياتك. كل طقس متكامل ومفسر وقابل للتسوق.',
+    recommended: 'موصى به',
+    chapter: 'مرحلة الطقس',
+    whySelected: 'لماذا ينتمي هذا المنتج إلى روتينك',
+    yourInvestment: 'قيمة طقس العناية',
+    officialBoutique: 'الانتقال إلى المتجر الرسمي',
+    beginAgain: 'بدء استشارة جديدة',
+    privateGuidance: 'خصوصية في التصميم',
+    cosmeticOnly: 'إرشاد تجميلي فقط',
+    explainable: 'كل اختيار موضح',
+    privilege: 'تجربة استثنائية',
+    privilegeText: 'من السؤال الأول إلى طقس العناية النهائي، صُمم كل تفصيل ليكون هادئاً وشخصياً ومدروساً.',
+    observed: 'ملاحظ من الصورة',
+    declared: 'تمت مشاركته منك',
+    morning: 'طقس الصباح',
+    evening: 'طقس المساء',
+    tailoredFor: 'مصمم من أجل'
+  }
+};
 
 const defaultAnswers: Answers = {
   feel: 'dry',
@@ -26,16 +262,27 @@ const defaultAnswers: Answers = {
   routine: 'complete'
 };
 
-function Logo() {
+const questionDefs = [
+  {id: 'feel', options: ['comfortable', 'dry', 'oily', 'combination'], icon: Droplets},
+  {id: 'shine', options: ['rarely', 'hours', 'quickly', 'areas'], icon: SunMedium},
+  {id: 'sensitivity', options: ['rarely', 'sometimes', 'frequent', 'diagnosed'], icon: Feather},
+  {id: 'concern', options: ['dryness', 'dullness', 'tone', 'spots', 'blemishes', 'shine', 'lines', 'maintenance'], icon: Sparkles},
+  {id: 'climate', options: ['hot-humid', 'hot-dry', 'air-conditioned', 'sun', 'mild', 'cold-dry'], icon: Globe2},
+  {id: 'texture', options: ['lightweight', 'rich', 'none'], icon: Leaf},
+  {id: 'routine', options: ['essential', 'complete', 'ritual'], icon: Crown}
+] as const;
+
+const stageOrder: Stage[] = ['welcome', 'privacy', 'portrait', 'consultation', 'atelier', 'reveal'];
+
+function BrandMark({inverse = false}: {inverse?: boolean}) {
   return (
     <div className="flex items-center gap-3 text-start">
-      <div className="flex h-12 w-12 items-center justify-center border border-[#d8bd72] bg-[#0d0d0d] text-[#d8bd72] shadow-sm">
-        <Crown className="h-7 w-7" strokeWidth={1.55} />
+      <div className={`brand-seal ${inverse ? 'brand-seal-inverse' : ''}`}>
+        <Crown className="h-5 w-5" strokeWidth={1.45} />
       </div>
-      <div className="leading-none">
-        <div className="font-display text-[1.35rem] font-bold tracking-[.16em] text-[#0d0d0d]">CARIMO</div>
-        <div className="mt-1 text-[8px] font-semibold uppercase tracking-[.25em] text-[#77716a]">L’audace d’être soi</div>
-        <div className="mt-1 text-[9px] font-extrabold uppercase tracking-[.18em] text-[#d1007f]">SkinMatch AI</div>
+      <div>
+        <div className={`font-display text-[1.08rem] font-semibold tracking-[.24em] ${inverse ? 'text-white' : 'text-[var(--ink)]'}`}>CARIMO</div>
+        <div className={`mt-1 text-[8px] font-semibold uppercase tracking-[.31em] ${inverse ? 'text-white/50' : 'text-[var(--muted)]'}`}>Private Beauty Suite</div>
       </div>
     </div>
   );
@@ -46,6 +293,7 @@ function LanguageSelector() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const names: Record<Locale, string> = {en: 'English', ar: 'العربية', fr: 'Français'};
 
   function switchLocale(next: Locale) {
     const segments = pathname.split('/');
@@ -56,415 +304,181 @@ function LanguageSelector() {
     setOpen(false);
   }
 
-  const names: Record<Locale, string> = {en: 'English', ar: 'العربية', fr: 'Français'};
-
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)} className="glass flex items-center gap-2 rounded-none border border-[#d9d1c4] px-3 py-2 text-sm font-semibold text-[#3e3a34] shadow-sm" aria-expanded={open}>
+      <button className="language-trigger" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-haspopup="listbox">
         <Globe2 className="h-4 w-4" />
-        <span>{names[locale]}</span>
-        <ChevronDown className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">{names[locale]}</span>
+        <ChevronDown className={`h-3.5 w-3.5 transition ${open ? 'rotate-180' : ''}`} />
       </button>
-      {open && (
-        <div className="absolute end-0 z-50 mt-2 min-w-36 overflow-hidden border border-[#d9d1c4] bg-white p-1 shadow-xl">
-          {locales.map((item) => (
-            <button key={item} onClick={() => switchLocale(item)} className={`flex w-full items-center justify-between px-3 py-2 text-sm ${item === locale ? 'bg-[#f6f0e5] font-bold text-[#111111]' : 'hover:bg-stone-50'}`}>
-              {names[item]} {item === locale && <Check className="h-4 w-4" />}
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{opacity: 0, y: 8, scale: .98}} animate={{opacity: 1, y: 0, scale: 1}} exit={{opacity: 0, y: 6, scale: .98}} className="language-menu" role="listbox">
+            {locales.map((item) => (
+              <button key={item} onClick={() => switchLocale(item)} className={item === locale ? 'is-active' : ''} role="option" aria-selected={item === locale}>
+                <span>{names[item]}</span>{item === locale && <Check className="h-4 w-4" />}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function Header({reset}: {reset: () => void}) {
-  const t = useTranslations('common');
+function Header({reset, stage}: {reset: () => void; stage: Stage}) {
   const locale = useLocale() as Locale;
-  const shopLabel: Record<Locale, string> = {en: 'Shop', ar: 'المتجر', fr: 'Boutique'};
-
+  const c = copy[locale];
   return (
-    <>
-      <div className="border-b border-[#2c2c2c] bg-[#0d0d0d] px-5 py-2 text-center text-[10px] font-semibold uppercase tracking-[.22em] text-[#d8bd72]">
-        CARIMO EMPIRE · L’audace d’être soi
+    <header className="site-header">
+      <div className="site-header-inner">
+        <button onClick={reset} aria-label="CARIMO SkinMatch home"><BrandMark /></button>
+        <div className="hidden items-center gap-3 lg:flex">
+          <span className="header-whisper"><LockKeyhole className="h-3.5 w-3.5" /> {c.session}</span>
+          {stage !== 'welcome' && <StageDots stage={stage} compact />}
+        </div>
+        <div className="flex items-center gap-2">
+          <a className="boutique-link hidden sm:inline-flex" href="https://www.carimoempire.com/shop/" target="_blank" rel="noreferrer"><ShoppingBag className="h-4 w-4" /><span>{c.officialBoutique}</span></a>
+          <LanguageSelector />
+        </div>
       </div>
-      <header className="sticky top-0 z-40 border-b border-[#ece6db] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-8">
-          <button onClick={reset} aria-label="CARIMO SkinMatch home"><Logo /></button>
-          <div className="flex items-center gap-2 md:gap-3">
-            <span className="hidden border-s-2 border-[#d1007f] px-3 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-[#5f5a53] lg:block">{t('demoBadge')}</span>
-            <a href="https://www.carimoempire.com/shop/" target="_blank" rel="noreferrer" className="hidden border border-[#0d0d0d] bg-[#0d0d0d] px-4 py-2.5 text-xs font-bold uppercase tracking-[.1em] text-white transition hover:border-[#d1007f] hover:bg-[#d1007f] sm:block">
-              {shopLabel[locale]}
-            </a>
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
-    </>
+    </header>
   );
 }
 
-function Progress({stage}: {stage: Stage}) {
-  const stages: Stage[] = ['consent', 'capture', 'questions', 'analyzing', 'results'];
-  if (stage === 'landing') return null;
-  const index = stages.indexOf(stage);
+function StageDots({stage, compact = false}: {stage: Stage; compact?: boolean}) {
+  const active = stageOrder.indexOf(stage);
+  return <div className={compact ? 'stage-dots compact' : 'stage-dots'} aria-label="Consultation progress">{stageOrder.slice(1, -1).map((item, index) => <span key={item} className={index <= active - 1 ? 'active' : ''} />)}</div>;
+}
+
+function PageTransition({children, stage}: {children: ReactNode; stage: Stage}) {
+  const reduceMotion = useReducedMotion();
   return (
-    <div className="mx-auto mb-5 flex w-full max-w-3xl gap-2 px-5">
-      {stages.map((item, i) => <div key={item} className={`h-1.5 flex-1 rounded-full transition ${i <= index ? 'bg-[#111111]' : 'bg-[#e7e0d4]'}`} />)}
-    </div>
+    <motion.div key={stage} initial={reduceMotion ? {opacity: 0} : {opacity: 0, y: 18, filter: 'blur(6px)'}} animate={reduceMotion ? {opacity: 1} : {opacity: 1, y: 0, filter: 'blur(0px)'}} exit={reduceMotion ? {opacity: 0} : {opacity: 0, y: -10, filter: 'blur(4px)'}} transition={{duration: reduceMotion ? .15 : .55, ease: [0.22, 1, 0.36, 1]}}>
+      {children}
+    </motion.div>
   );
 }
 
-function Landing({start, skipPhoto}: {start: () => void; skipPhoto: () => void}) {
-  const t = useTranslations('landing');
+function Welcome({start, skip}: {start: () => void; skip: () => void}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
+  const tLanding = useTranslations('landing');
   return (
-    <main className="mx-auto grid min-h-[calc(100vh-144px)] w-full max-w-7xl items-center gap-10 px-5 pb-16 pt-10 md:grid-cols-[1.02fr_.98fr] md:px-8 md:pb-20 md:pt-14">
-      <section className="relative z-10">
-        <div className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[.18em] text-[#9a761f]">
-          <span className="h-px w-10 bg-[#c9a64e]" />
-          <WandSparkles className="h-4 w-4" /> {t('eyebrow')}
+    <main className="welcome-page">
+      <div className="welcome-glow welcome-glow-one" /><div className="welcome-glow welcome-glow-two" />
+      <section className="welcome-copy">
+        <div className="editorial-kicker"><span /><Gem className="h-4 w-4" /> {c.privateSuite}</div>
+        <h1>{c.privateConsultation}</h1>
+        <p className="welcome-lead">{c.invitation}</p>
+        <div className="welcome-actions">
+          <button className="button-primary" onClick={start}><span>{c.start}</span><ArrowRight className="rtl-flip h-4 w-4" /></button>
+          <button className="button-quiet" onClick={skip}>{c.withoutPhoto}</button>
         </div>
-        <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.03] text-[#0d0d0d] md:text-7xl">
-          {t.rich('title', {highlight: (chunks) => <span className="text-[#d1007f]">{chunks}</span>})}
-        </h1>
-        <div className="mt-5 h-px w-28 bg-gradient-to-r from-[#c9a64e] to-transparent" />
-        <p className="mt-6 max-w-xl text-lg leading-8 text-[#666159] md:text-xl">{t('subtitle')}</p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <button onClick={start} className="group flex items-center justify-center gap-2 bg-[#d1007f] px-7 py-4 font-bold uppercase tracking-[.06em] text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#a90067]">
-            <ScanFace className="h-5 w-5" /> {t('primary')}
-            <ArrowRight className="rtl-flip h-4 w-4 transition group-hover:translate-x-1" />
-          </button>
-          <button onClick={skipPhoto} className="flex items-center justify-center gap-2 border border-[#0d0d0d] bg-white px-7 py-4 font-bold uppercase tracking-[.04em] text-[#0d0d0d] transition hover:bg-[#0d0d0d] hover:text-white">
-            {t('secondary')}
-          </button>
-        </div>
-        <div className="mt-8 grid max-w-xl gap-3 border-y border-[#e7e0d4] py-5 text-sm text-[#625d56] sm:grid-cols-3">
-          <span className="flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-[#d1007f]" /> {t('private')}</span>
-          <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#d1007f]" /> {t('nonMedical')}</span>
-          <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-[#c9a64e]" /> {t('minutes')}</span>
+        <div className="appointment-note"><Clock3 className="h-4 w-4" /> {c.appointmentNote}</div>
+        <div className="welcome-pillars">
+          <ExperiencePillar icon={<MoonStar />} title={c.calm} text={c.calmText} />
+          <ExperiencePillar icon={<WandSparkles />} title={c.considered} text={c.consideredText} />
+          <ExperiencePillar icon={<LockKeyhole />} title={c.concierge} text={c.conciergeText} />
         </div>
       </section>
-
-      <section className="relative mx-auto w-full max-w-xl">
-        <div className="absolute -inset-5 border border-[#c9a64e]/30" />
-        <div className="relative border border-[#2a2a2a] bg-[#0d0d0d] p-3 shadow-luxury md:p-5">
-          <div className="relative min-h-[560px] overflow-hidden border border-[#c9a64e]/45 bg-[#111111] p-5 text-white">
-            <div className="absolute inset-0 mesh opacity-30" />
-            <div className="absolute inset-x-0 top-0 h-1 bg-[#d1007f]" />
-            <div className="relative flex items-center justify-between border-b border-white/[.15] pb-4">
-              <span className="text-xs font-bold uppercase tracking-[.18em] text-[#d8bd72]">{t('livePreview')}</span>
-              <Heart className="h-5 w-5 text-[#d1007f]" />
-            </div>
-            <div className="relative mx-auto mt-8 h-64 w-48 overflow-hidden rounded-[7rem_7rem_2rem_2rem] border border-[#c9a64e]/60 bg-gradient-to-b from-[#d9ad93] to-[#8f5c52] shadow-2xl">
-              <div className="absolute left-1/2 top-9 h-44 w-36 -translate-x-1/2 rounded-[48%] bg-[#b9806f]" />
-              <div className="absolute left-11 top-[94px] h-3 w-7 rounded-full bg-[#4d2a27]" />
-              <div className="absolute right-11 top-[94px] h-3 w-7 rounded-full bg-[#4d2a27]" />
-              <div className="absolute left-1/2 top-[126px] h-10 w-5 -translate-x-1/2 rounded-full border-b border-[#76483f]" />
-              <div className="absolute left-1/2 top-[161px] h-3 w-14 -translate-x-1/2 rounded-full bg-[#8e4c55]" />
-              <div className="scan-line absolute left-4 right-4 top-1/2 h-[2px] bg-[#d1007f] shadow-[0_0_18px_4px_rgba(209,0,127,.7)]" />
-            </div>
-            <div className="relative mt-6 grid grid-cols-3 gap-px overflow-hidden border border-white/[.15] bg-white/[.15]">
-              {[[t('hydration'), '78%'], [t('shine'), 'Low'], [t('match'), '82%']].map(([label, value]) => (
-                <div key={label} className="bg-[#161616] p-3 text-center">
-                  <div className="font-display text-xl font-bold text-[#d8bd72]">{value}</div><div className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/60">{label}</div>
-                </div>
-              ))}
-            </div>
-            <div className="relative mt-4 border border-[#d8bd72]/45 bg-white p-3 text-[#0d0d0d]">
-              <div className="flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="https://www.carimoempire.com/wp-content/uploads/2024/05/24k-gamme-4-352x440.png" alt="" className="h-16 w-16 bg-[#f6f3ec] object-contain" />
-                <div className="min-w-0 flex-1"><div className="text-[10px] font-bold uppercase tracking-[.12em] text-[#9a761f]">{t('personalMatch')}</div><div className="mt-1 truncate font-display text-lg font-bold">CARIMO Complete Routine</div></div>
-                <CircleCheck className="h-6 w-6 text-[#d1007f]" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="absolute -bottom-5 -start-4 border border-[#c9a64e] bg-white px-4 py-3 shadow-lg">
-          <div className="flex items-center gap-2 text-sm font-bold text-[#171717]"><Globe2 className="h-4 w-4 text-[#d1007f]" /> {t('threeLanguages')}</div>
-        </div>
+      <section className="welcome-visual" aria-label={tLanding('livePreview')}>
+        <div className="visual-frame-outer"><div className="visual-frame-inner">
+          <div className="visual-topline"><span>{c.privateSuite}</span><span className="live-dot"><i /> {tLanding('livePreview')}</span></div>
+          <div className="portrait-composition"><div className="portrait-halo" /><div className="portrait-silhouette"><div className="portrait-hair" /><div className="portrait-face"><span className="eye eye-left" /><span className="eye eye-right" /><span className="nose" /><span className="mouth" /></div><div className="portrait-scan" /></div><div className="portrait-caption"><span>{c.tailoredFor}</span><strong>{tLanding('personalMatch')}</strong></div></div>
+          <div className="visual-insights"><Insight label={tLanding('hydration')} value="78%" /><Insight label={tLanding('shine')} value="Low" /><Insight label={tLanding('match')} value="92%" accent /></div>
+          <div className="signature-preview"><div className="signature-product"><img src="https://www.carimoempire.com/wp-content/uploads/2024/05/24k-gamme-4-352x440.png" alt="" /></div><div><span>{c.signature}</span><strong>CARIMO Complete Ritual</strong><p>{c.signatureText}</p></div><CircleCheck className="h-6 w-6 text-[var(--rose)]" /></div>
+        </div></div>
+        <div className="floating-card floating-card-top"><Sparkles className="h-4 w-4" /> {c.privilege}</div><div className="floating-card floating-card-bottom"><Globe2 className="h-4 w-4" /> English · العربية · Français</div>
       </section>
     </main>
   );
 }
 
-function Consent({next, back}: {next: () => void; back: () => void}) {
+function ExperiencePillar({icon, title, text}: {icon: ReactNode; title: string; text: string}) { return <article><span className="pillar-icon">{icon}</span><div><h3>{title}</h3><p>{text}</p></div></article>; }
+function Insight({label, value, accent = false}: {label: string; value: string; accent?: boolean}) { return <div className={accent ? 'insight accent' : 'insight'}><strong>{value}</strong><span>{label}</span></div>; }
+
+function ConsultationFrame({eyebrow, title, description, icon, stage, children}: {eyebrow: string; title: string; description: string; icon: ReactNode; stage: Stage; children: ReactNode}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
+  const current = Math.max(1, stageOrder.indexOf(stage));
+  return (
+    <main className="consultation-page">
+      <aside className="consultation-aside"><div className="aside-monogram"><Crown className="h-6 w-6" /></div><div className="aside-copy"><span>{c.session}</span><strong>{String(current).padStart(2, '0')}</strong><small>{c.step}</small></div><StageDots stage={stage} /><div className="aside-security"><LockKeyhole className="h-4 w-4" /> {c.secure}</div></aside>
+      <section className="consultation-card"><div className="consultation-heading"><div className="consultation-icon">{icon}</div><div><div className="editorial-kicker"><span /> {eyebrow}</div><h1>{title}</h1><p>{description}</p></div></div><div className="consultation-body">{children}</div></section>
+    </main>
+  );
+}
+
+function Privacy({next, back}: {next: () => void; back: () => void}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
   const t = useTranslations('consent');
   const [checks, setChecks] = useState([false, false, false]);
   const all = checks.every(Boolean);
-  return (
-    <StageShell title={t('title')} subtitle={t('subtitle')} icon={<ShieldCheck className="h-6 w-6" />}>
-      <div className="space-y-3">
-        {[t('temporary'), t('nonDiagnostic'), t('recommendations')].map((label, i) => (
-          <button key={label} onClick={() => setChecks((old) => old.map((v, index) => index === i ? !v : v))} className="flex w-full items-start gap-3 rounded-2xl border border-[#e7e0d4] bg-white p-4 text-start transition hover:border-[#c9a64e]">
-            <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border ${checks[i] ? 'border-[#111111] bg-[#111111] text-white' : 'border-[#cfc5b6]'}`}>{checks[i] && <Check className="h-4 w-4" />}</span>
-            <span className="text-sm leading-6 text-[#4d4943]">{label}</span>
-          </button>
-        ))}
-      </div>
-      <div className="mt-5 rounded-2xl bg-[#f7f3ec] p-4 text-sm leading-6 text-[#6d6962]">
-        <div className="mb-1 flex items-center gap-2 font-bold text-[#171717]"><LockKeyhole className="h-4 w-4" /> {t('privacyTitle')}</div>
-        {t('privacyText')}
-      </div>
-      <NavButtons back={back} next={next} disabled={!all} nextLabel={t('continue')} />
-    </StageShell>
-  );
+  const items = [{label: t('temporary'), icon: LockKeyhole}, {label: t('nonDiagnostic'), icon: ShieldCheck}, {label: t('recommendations'), icon: Sparkles}];
+  return <ConsultationFrame stage="privacy" eyebrow={c.privacyEyebrow} title={t('title')} description={t('subtitle')} icon={<ShieldCheck className="h-6 w-6" />}><div className="privacy-grid">{items.map(({label, icon: Icon}, index) => <button key={label} className={checks[index] ? 'consent-card selected' : 'consent-card'} onClick={() => setChecks((old) => old.map((value, item) => item === index ? !value : value))}><span className="consent-icon"><Icon className="h-5 w-5" /></span><span>{label}</span><i>{checks[index] && <Check className="h-4 w-4" />}</i></button>)}</div><div className="privacy-note"><LockKeyhole className="h-5 w-5" /><div><strong>{t('privacyTitle')}</strong><p>{t('privacyText')}</p></div></div><Navigation back={back} next={next} disabled={!all} nextLabel={t('continue')} /></ConsultationFrame>;
 }
 
-function Capture({next, back, skip, photo, setPhoto}: {next: () => void; back: () => void; skip: () => void; photo: string | null; setPhoto: (v: string | null) => void}) {
+function Portrait({next, back, skip, photo, setPhoto}: {next: () => void; back: () => void; skip: () => void; photo: string | null; setPhoto: (value: string | null) => void}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
   const t = useTranslations('capture');
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function handleFile(file?: File) {
-    if (!file) return;
-    setPhoto(URL.createObjectURL(file));
-  }
-
-  return (
-    <StageShell title={t('title')} subtitle={t('subtitle')} icon={<Camera className="h-6 w-6" />}>
-      <input ref={inputRef} type="file" accept="image/*" capture="user" hidden onChange={(e) => handleFile(e.target.files?.[0])} />
-      {photo ? (
-        <div className="relative overflow-hidden border border-[#ded7ca] bg-stone-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo} alt={t('previewAlt')} className="h-80 w-full object-cover" />
-          <button onClick={() => setPhoto(null)} className="absolute end-3 top-3 rounded-full bg-black/55 p-2 text-white"><X className="h-4 w-4" /></button>
-          <div className="absolute bottom-3 start-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-bold text-emerald-700"><CircleCheck className="h-4 w-4" /> {t('qualityPass')}</div>
-        </div>
-      ) : (
-        <button onClick={() => inputRef.current?.click()} className="group flex h-80 w-full flex-col items-center justify-center border-2 border-dashed border-[#d7cec0] bg-gradient-to-b from-white to-[#fbfaf7] transition hover:border-[#c9a64e]">
-          <span className="flex h-20 w-20 items-center justify-center border border-[#d8bd72] bg-[#0d0d0d] text-[#d8bd72] shadow-sm transition group-hover:scale-105"><Camera className="h-8 w-8" /></span>
-          <span className="mt-5 font-bold text-[#171717]">{t('takeOrUpload')}</span>
-          <span className="mt-2 max-w-xs text-center text-sm leading-6 text-[#6d6962]">{t('tip')}</span>
-        </button>
-      )}
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs text-[#6d6962]">
-        <div className="rounded-xl bg-[#f7f3ec] p-3"><SunMedium className="mx-auto mb-2 h-4 w-4" />{t('light')}</div>
-        <div className="rounded-xl bg-[#f7f3ec] p-3"><ScanFace className="mx-auto mb-2 h-4 w-4" />{t('center')}</div>
-        <div className="rounded-xl bg-[#f7f3ec] p-3"><Sparkles className="mx-auto mb-2 h-4 w-4" />{t('noFilter')}</div>
-      </div>
-      <button onClick={skip} className="mx-auto mt-5 block text-sm font-bold text-[#111111] underline decoration-[#d1007f] underline-offset-4">{t('skip')}</button>
-      <NavButtons back={back} next={next} disabled={!photo} nextLabel={t('usePhoto')} />
-    </StageShell>
-  );
+  const input = useRef<HTMLInputElement>(null);
+  function choose(file?: File) { if (file) setPhoto(URL.createObjectURL(file)); }
+  return <ConsultationFrame stage="portrait" eyebrow={c.portraitEyebrow} title={c.portraitStudio} description={c.portraitStudioText} icon={<Camera className="h-6 w-6" />}><input ref={input} hidden type="file" accept="image/*" capture="user" onChange={(event) => choose(event.target.files?.[0])} /><div className="portrait-studio">{photo ? <div className="portrait-preview"><img src={photo} alt={t('previewAlt')} /><div className="portrait-guide"><span /><span /><span /><span /></div><div className="portrait-ready"><CircleCheck className="h-4 w-4" /> {c.photoReady}</div><button className="portrait-remove" onClick={() => setPhoto(null)} aria-label={c.replacePhoto}><X className="h-4 w-4" /></button></div> : <button className="portrait-upload" onClick={() => input.current?.click()}><span className="camera-orbit"><Camera className="h-8 w-8" /></span><strong>{t('takeOrUpload')}</strong><p>{t('tip')}</p><i>{c.secure}</i></button>}<div className="studio-directions"><Direction icon={<SunMedium />} text={t('light')} /><Direction icon={<ScanFace />} text={t('center')} /><Direction icon={<Sparkles />} text={t('noFilter')} /></div></div><button className="text-link" onClick={skip}>{t('skip')}</button><Navigation back={back} next={next} disabled={!photo} nextLabel={t('usePhoto')} /></ConsultationFrame>;
 }
+function Direction({icon, text}: {icon: ReactNode; text: string}) { return <div><span>{icon}</span><p>{text}</p></div>; }
 
-const questionDefs = [
-  {id: 'feel', options: ['comfortable', 'dry', 'oily', 'combination']},
-  {id: 'shine', options: ['rarely', 'hours', 'quickly', 'areas']},
-  {id: 'sensitivity', options: ['rarely', 'sometimes', 'frequent', 'diagnosed']},
-  {id: 'concern', options: ['dryness', 'dullness', 'tone', 'spots', 'blemishes', 'shine', 'lines', 'maintenance']},
-  {id: 'climate', options: ['hot-humid', 'hot-dry', 'air-conditioned', 'sun', 'mild', 'cold-dry']},
-  {id: 'texture', options: ['lightweight', 'rich', 'none']},
-  {id: 'routine', options: ['essential', 'complete', 'ritual']}
-] as const;
-
-function Questions({answers, setAnswers, next, back}: {answers: Answers; setAnswers: (v: Answers) => void; next: () => void; back: () => void}) {
+function Consultation({answers, setAnswers, next, back}: {answers: Answers; setAnswers: (answers: Answers) => void; next: () => void; back: () => void}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
   const t = useTranslations('questions');
   const [index, setIndex] = useState(0);
-  const q = questionDefs[index];
-  const current = answers[q.id as keyof Answers];
+  const question = questionDefs[index];
+  const current = answers[question.id as keyof Answers];
   const isLast = index === questionDefs.length - 1;
-
-  function select(value: string) {
-    setAnswers({...answers, [q.id]: value});
-  }
-
-  function proceed() {
-    if (isLast) next(); else setIndex(index + 1);
-  }
-
-  function goBack() {
-    if (index === 0) back(); else setIndex(index - 1);
-  }
-
-  return (
-    <StageShell title={t(`${q.id}.title`)} subtitle={t('step', {current: index + 1, total: questionDefs.length})} icon={<Droplets className="h-6 w-6" />}>
-      <div className="mb-6 h-2 overflow-hidden rounded-full bg-[#eee7dc]"><div className="h-full rounded-full bg-[#111111] transition-all" style={{width: `${((index + 1) / questionDefs.length) * 100}%`}} /></div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {q.options.map((option) => (
-          <button key={option} onClick={() => select(option)} className={`min-h-20 rounded-2xl border p-4 text-start text-sm font-semibold leading-5 transition ${current === option ? 'border-[#d1007f] bg-[#fff5fb] text-[#171717] shadow-sm' : 'border-[#e7e0d4] bg-white text-[#5f5a53] hover:border-[#c9a64e]'}`}>
-            <span className="flex items-center justify-between gap-3">{t(`${q.id}.options.${option}`)} {current === option && <CircleCheck className="h-5 w-5 shrink-0 text-[#d1007f]" />}</span>
-          </button>
-        ))}
-      </div>
-      {q.id === 'sensitivity' && current === 'diagnosed' && <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">{t('medicalNotice')}</div>}
-      <NavButtons back={goBack} next={proceed} nextLabel={isLast ? t('build') : t('next')} />
-    </StageShell>
-  );
+  const Icon = question.icon;
+  function select(value: string) { setAnswers({...answers, [question.id]: value}); }
+  function forward() { if (isLast) next(); else setIndex((value) => value + 1); }
+  function backward() { if (index === 0) back(); else setIndex((value) => value - 1); }
+  return <ConsultationFrame stage="consultation" eyebrow={c.consultationEyebrow} title={t(`${question.id}.title`)} description={c.chooseAnswer} icon={<Icon className="h-6 w-6" />}><div className="question-meter"><span style={{width: `${((index + 1) / questionDefs.length) * 100}%`}} /><small>{t('step', {current: index + 1, total: questionDefs.length})}</small></div><div className={`answer-grid ${question.options.length > 6 ? 'answer-grid-dense' : ''}`}>{question.options.map((option, optionIndex) => <button key={option} onClick={() => select(option)} className={current === option ? 'answer-card selected' : 'answer-card'}><span className="answer-index">{String(optionIndex + 1).padStart(2, '0')}</span><span className="answer-label">{t(`${question.id}.options.${option}`)}</span><span className="answer-check">{current === option && <Check className="h-4 w-4" />}</span></button>)}</div>{question.id === 'sensitivity' && current === 'diagnosed' && <div className="medical-note"><ShieldCheck className="h-5 w-5" /> {t('medicalNotice')}</div>}<Navigation back={backward} next={forward} nextLabel={isLast ? t('build') : t('next')} /></ConsultationFrame>;
 }
 
-function Analyzing({hasPhoto}: {hasPhoto: boolean}) {
+function Atelier({hasPhoto}: {hasPhoto: boolean}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
   const t = useTranslations('analysis');
-  const items = hasPhoto ? ['quality', 'visible', 'answers', 'matching', 'building'] : ['answers', 'matching', 'building'];
-  return (
-    <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-5 text-center">
-      <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-[#f1eadb]">
-        <div className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-t-[#d1007f]" />
-        <ScanFace className="h-14 w-14 text-[#d1007f]" />
-      </div>
-      <h2 className="mt-8 font-display text-4xl font-semibold text-[#171717]">{t('title')}</h2>
-      <p className="mt-3 text-[#6d6962]">{t('subtitle')}</p>
-      <div className="mt-8 w-full space-y-3 text-start">
-        {items.map((item, i) => (
-          <div key={item} className="glass flex items-center gap-3 rounded-2xl px-4 py-3 shadow-sm" style={{opacity: 1 - i * .1}}>
-            {i === items.length - 1 ? <LoaderCircle className="h-5 w-5 animate-spin text-[#d1007f]" /> : <CircleCheck className="h-5 w-5 text-emerald-600" />}
-            <span className="text-sm font-semibold text-[#4d4943]">{t(item)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const steps = hasPhoto ? ['quality', 'visible', 'answers', 'matching', 'building'] : ['answers', 'matching', 'building'];
+  return <main className="atelier-page"><div className="atelier-orbit orbit-one" /><div className="atelier-orbit orbit-two" /><div className="atelier-center"><div className="editorial-kicker light"><span /> {c.atelierEyebrow}</div><div className="atelier-emblem"><Crown className="h-8 w-8" /><span /></div><h1>{c.atelierTitle}</h1><p>{c.atelierText}</p><div className="atelier-status"><i /><span>{c.curation}</span></div><div className="atelier-steps">{steps.map((step, index) => <motion.div key={step} initial={{opacity: 0, y: 12}} animate={{opacity: 1, y: 0}} transition={{delay: .2 + index * .18}}>{index === steps.length - 1 ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <CircleCheck className="h-5 w-5" />}<span>{t(step)}</span></motion.div>)}</div></div></main>;
 }
 
-function ProductCard({product, answers}: {product: Product; answers: Answers}) {
-  const t = useTranslations('results');
-  const locale = useLocale();
-  return (
-    <article className="group overflow-hidden border border-[#e5dfd4] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[#c9a64e] hover:shadow-luxury">
-      <ProductVisual accent={product.accent} initials={product.initials} imageUrl={product.imageUrl} compact />
-      <div className="p-5">
-        <div className="flex items-center justify-between gap-3 border-b border-[#eee8de] pb-3 text-[10px] font-extrabold uppercase tracking-[.14em] text-[#9a761f]">
-          <span>{t(`steps.${product.step}`)}</span><span className="text-sm tracking-normal text-[#0d0d0d]">{new Intl.NumberFormat(locale, {style: 'currency', currency: 'EUR'}).format(product.price)}</span>
-        </div>
-        <h3 className="mt-4 min-h-12 font-display text-xl font-semibold leading-6 text-[#171717]">{product.name}</h3>
-        <p className="mt-3 min-h-16 text-sm leading-6 text-[#6d6962]">{t('reason', {concern: t(`concerns.${answers.concern}`), climate: t(`climates.${answers.climate}`)})}</p>
-        <a href={product.url} target="_blank" rel="noreferrer" className="mt-5 flex w-full items-center justify-center gap-2 bg-[#0d0d0d] px-4 py-3 text-xs font-bold uppercase tracking-[.08em] text-white transition hover:bg-[#d1007f]">
-          {t('viewProduct')} <ExternalLink className="h-4 w-4" />
-        </a>
-      </div>
-    </article>
-  );
-}
-
-function Results({answers, reset, source}: {answers: Answers; reset: () => void; source: string}) {
+function Reveal({answers, reset, source}: {answers: Answers; reset: () => void; source: string}) {
+  const locale = useLocale() as Locale;
+  const c = copy[locale];
   const t = useTranslations('results');
   const [tier, setTier] = useState<Answers['routine']>(answers.routine);
-  const selected = useMemo(() => recommend(answers, tier), [answers, tier]);
-  const total = selected.reduce((sum, p) => sum + p.price, 0);
-  const locale = useLocale();
-
-  return (
-    <main className="mx-auto w-full max-w-7xl px-5 pb-20 pt-4 md:px-8">
-      <section className="relative overflow-hidden border border-[#2b2b2b] bg-[#0d0d0d] p-6 text-white shadow-luxury md:p-10">
-        <div className="absolute inset-x-0 top-0 h-1 bg-[#d1007f]" />
-        <div className="absolute -end-12 -top-16 h-52 w-52 rounded-full border border-[#c9a64e]/25" />
-        <div className="grid gap-8 md:grid-cols-[1.15fr_.85fr] md:items-center">
-          <div className="relative">
-            <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-[.18em] text-[#d8bd72]"><span className="h-px w-8 bg-[#d8bd72]" /><Sparkles className="h-4 w-4" /> {t('profile')}</div>
-            <h1 className="mt-5 font-display text-4xl font-semibold md:text-6xl">{t('profileTitle')}</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/[.72]">{t('summary', {concern: t(`concerns.${answers.concern}`), climate: t(`climates.${answers.climate}`)})}</p>
-            <div className="mt-6 inline-flex items-center gap-2 border-s-2 border-[#d1007f] ps-3 text-xs text-white/[.65]"><ShieldCheck className="h-4 w-4" /> {source === 'questionnaire-only' ? t('questionnaireOnly') : t('photoAndAnswers')}</div>
-          </div>
-          <div className="relative grid grid-cols-2 gap-px overflow-hidden border border-white/[.15] bg-white/[.15]">
-            <Metric value={answers.feel === 'dry' ? t('levels.high') : t('levels.moderate')} label={t('hydrationNeed')} />
-            <Metric value={answers.shine === 'quickly' ? t('levels.high') : t('levels.low')} label={t('visibleShine')} />
-            <Metric value={t(`levels.${answers.concern === 'tone' || answers.concern === 'spots' ? 'moderate' : 'low'}`)} label={t('uneven')} />
-            <Metric value={t(`sensitivity.${answers.sensitivity}`)} label={t('declaredSensitivity')} />
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <div className="flex flex-col justify-between gap-5 border-b border-[#ded7ca] pb-5 md:flex-row md:items-end">
-          <div><div className="flex items-center gap-3 text-xs font-bold uppercase tracking-[.18em] text-[#9a761f]"><span className="h-px w-8 bg-[#c9a64e]" />{t('routineEyebrow')}</div><h2 className="mt-3 font-display text-4xl font-semibold text-[#171717]">{t('routineTitle')}</h2></div>
-          <div className="flex overflow-hidden border border-[#d9d1c4] bg-white">
-            {(['essential', 'complete', 'ritual'] as const).map((item) => (
-              <button key={item} onClick={() => setTier(item)} className={`border-e border-[#e7e0d4] px-4 py-3 text-xs font-bold uppercase tracking-[.05em] transition last:border-e-0 md:text-sm ${tier === item ? 'bg-[#d1007f] text-white' : 'text-[#5f5a53] hover:bg-[#f7f3ec]'}`}>{t(`tiers.${item}`)}</button>
-            ))}
-          </div>
-        </div>
-        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {selected.map((product) => <ProductCard key={product.id} product={product} answers={answers} />)}
-        </div>
-        <div className="mt-7 flex flex-col items-center justify-between gap-4 border border-[#d9d1c4] bg-white p-5 shadow-sm sm:flex-row">
-          <div><div className="text-xs font-bold uppercase tracking-[.12em] text-[#817a70]">{t('estimatedTotal')}</div><div className="mt-1 font-display text-3xl font-bold text-[#0d0d0d]">{new Intl.NumberFormat(locale, {style: 'currency', currency: 'EUR'}).format(total)}</div></div>
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <button onClick={reset} className="border border-[#0d0d0d] px-5 py-3 text-xs font-bold uppercase tracking-[.07em] text-[#0d0d0d] transition hover:bg-[#0d0d0d] hover:text-white">{t('restart')}</button>
-            <a href="https://www.carimoempire.com/shop/" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#d1007f] px-6 py-3 text-xs font-bold uppercase tracking-[.07em] text-white transition hover:bg-[#a90067]"><ShoppingBag className="h-4 w-4" /> {t('shopRoutine')}</a>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-12 grid gap-5 md:grid-cols-3">
-        <Trust icon={<LockKeyhole />} title={t('trust.privateTitle')} text={t('trust.privateText')} />
-        <Trust icon={<ShieldCheck />} title={t('trust.guidanceTitle')} text={t('trust.guidanceText')} />
-        <Trust icon={<WandSparkles />} title={t('trust.personalTitle')} text={t('trust.personalText')} />
-      </section>
-    </main>
-  );
+  const products = useMemo(() => recommend(answers, tier), [answers, tier]);
+  const total = products.reduce((sum, product) => sum + product.price, 0);
+  const price = new Intl.NumberFormat(locale, {style: 'currency', currency: 'EUR'}).format(total);
+  const metrics = [{label: t('hydrationNeed'), value: answers.feel === 'dry' ? t('levels.high') : t('levels.moderate')}, {label: t('visibleShine'), value: answers.shine === 'quickly' ? t('levels.high') : t('levels.low')}, {label: t('uneven'), value: t(`levels.${answers.concern === 'tone' || answers.concern === 'spots' ? 'moderate' : 'low'}`)}, {label: t('declaredSensitivity'), value: t(`sensitivity.${answers.sensitivity}`)}];
+  return <main className="reveal-page"><section className="reveal-hero"><div className="reveal-hero-copy"><div className="editorial-kicker light"><span /> {c.revealEyebrow}</div><h1>{t('profileTitle')}</h1><p>{t('summary', {concern: t(`concerns.${answers.concern}`), climate: t(`climates.${answers.climate}`)})}</p><div className="source-badge"><ShieldCheck className="h-4 w-4" /> {source === 'questionnaire-only' ? t('questionnaireOnly') : t('photoAndAnswers')}</div></div><div className="profile-jewel"><div className="profile-jewel-inner"><Crown className="h-9 w-9" /><span>CARIMO</span><small>SkinMatch</small></div></div></section><section className="profile-section"><div className="section-heading"><div><span>{c.profile}</span><h2>{c.profileText}</h2></div><div className="profile-source-legend"><span><Eye className="h-4 w-4" /> {c.observed}</span><span><Heart className="h-4 w-4" /> {c.declared}</span></div></div><div className="metric-grid">{metrics.map((metric, index) => <MetricCard key={metric.label} {...metric} index={index} />)}</div></section><section className="ritual-section"><div className="section-heading ritual-heading"><div><span>{c.ritualIntro}</span><h2>{c.ritualDescription}</h2></div></div><div className="tier-selector">{(['essential', 'complete', 'ritual'] as const).map((item) => <button key={item} onClick={() => setTier(item)} className={tier === item ? 'selected' : ''}><span>{t(`tiers.${item}`)}</span><small>{item === 'essential' ? '2–3' : item === 'complete' ? '4' : '5+'} products</small>{item === 'complete' && <i>{c.recommended}</i>}</button>)}</div><div className="ritual-layout"><div className="ritual-products">{products.map((product, index) => <RitualProduct key={product.id} product={product} answers={answers} index={index} />)}</div><aside className="ritual-summary"><span className="summary-eyebrow">{c.yourInvestment}</span><strong>{price}</strong><div className="summary-rule" /><ul><li><MoonStar className="h-4 w-4" /> {c.morning}</li><li><Sparkles className="h-4 w-4" /> {c.evening}</li><li><ShieldCheck className="h-4 w-4" /> {c.explainable}</li></ul><a href="https://www.carimoempire.com/shop/" target="_blank" rel="noreferrer" className="button-primary summary-cta"><ShoppingBag className="h-4 w-4" /><span>{c.officialBoutique}</span><ArrowRight className="rtl-flip h-4 w-4" /></a><button className="summary-restart" onClick={reset}>{c.beginAgain}</button></aside></div></section><section className="privilege-section"><div><span className="editorial-kicker"><span /> {c.privilege}</span><h2>{c.privilegeText}</h2></div><div className="privilege-grid"><Privilege icon={<LockKeyhole />} title={c.privateGuidance} text={t('trust.privateText')} /><Privilege icon={<ShieldCheck />} title={c.cosmeticOnly} text={t('trust.guidanceText')} /><Privilege icon={<WandSparkles />} title={c.explainable} text={t('trust.personalText')} /></div></section></main>;
 }
 
-function Metric({value, label}: {value: string; label: string}) {
-  return <div className="bg-[#151515] p-4"><div className="font-display text-2xl font-bold text-[#d8bd72]">{value}</div><div className="mt-1 text-xs text-white/60">{label}</div></div>;
-}
-
-function Trust({icon, title, text}: {icon: ReactNode; title: string; text: string}) {
-  return <div className="border border-[#e0d9cd] bg-white p-6"><div className="flex h-11 w-11 items-center justify-center border border-[#d8bd72] bg-[#0d0d0d] text-[#d8bd72]">{icon}</div><h3 className="mt-4 font-display text-xl font-semibold">{title}</h3><div className="mt-3 h-px w-10 bg-[#d1007f]" /><p className="mt-3 text-sm leading-6 text-[#6d6962]">{text}</p></div>;
-}
-
-function StageShell({title, subtitle, icon, children}: {title: string; subtitle: string; icon: ReactNode; children: ReactNode}) {
-  return (
-    <main className="mx-auto w-full max-w-2xl px-5 pb-16 pt-6">
-      <div className="relative border border-[#ded7ca] bg-white p-5 shadow-luxury md:p-8">
-        <div className="absolute inset-x-0 top-0 h-1 bg-[#d1007f]" />
-        <div className="flex h-12 w-12 items-center justify-center border border-[#d8bd72] bg-[#0d0d0d] text-[#d8bd72]">{icon}</div>
-        <div className="mt-5 h-px w-14 bg-[#c9a64e]" />
-        <h1 className="mt-4 font-display text-3xl font-semibold leading-tight text-[#171717] md:text-4xl">{title}</h1>
-        <p className="mb-7 mt-2 leading-7 text-[#6d6962]">{subtitle}</p>
-        {children}
-      </div>
-    </main>
-  );
-}
-
-function NavButtons({back, next, disabled = false, nextLabel}: {back: () => void; next: () => void; disabled?: boolean; nextLabel: string}) {
-  const t = useTranslations('common');
-  return (
-    <div className="mt-7 flex items-center justify-between gap-3">
-      <button onClick={back} className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-[#6d6962] transition hover:text-[#d1007f]"><ArrowLeft className="rtl-flip h-4 w-4" /> {t('back')}</button>
-      <button onClick={next} disabled={disabled} className="flex items-center gap-2 bg-[#d1007f] px-6 py-3 text-sm font-bold uppercase tracking-[.05em] text-white transition hover:bg-[#a90067] disabled:cursor-not-allowed disabled:opacity-35">{nextLabel} <ArrowRight className="rtl-flip h-4 w-4" /></button>
-    </div>
-  );
-}
+function MetricCard({label, value, index}: {label: string; value: string; index: number}) { return <article className="metric-card"><span>{String(index + 1).padStart(2, '0')}</span><strong>{value}</strong><p>{label}</p></article>; }
+function RitualProduct({product, answers, index}: {product: Product; answers: Answers; index: number}) { const locale = useLocale() as Locale; const c = copy[locale]; const t = useTranslations('results'); const price = new Intl.NumberFormat(locale, {style: 'currency', currency: 'EUR'}).format(product.price); return <article className="ritual-product"><div className="ritual-product-number"><span>{c.chapter}</span><strong>{String(index + 1).padStart(2, '0')}</strong></div><div className="ritual-product-visual"><ProductVisual accent={product.accent} initials={product.initials} imageUrl={product.imageUrl} compact /></div><div className="ritual-product-copy"><div className="product-meta"><span>{t(`steps.${product.step}`)}</span><strong>{price}</strong></div><h3>{product.name}</h3><span className="why-label">{c.whySelected}</span><p>{t('reason', {concern: t(`concerns.${answers.concern}`), climate: t(`climates.${answers.climate}`)})}</p><a href={product.url} target="_blank" rel="noreferrer">{t('viewProduct')} <ExternalLink className="h-4 w-4" /></a></div></article>; }
+function Privilege({icon, title, text}: {icon: ReactNode; title: string; text: string}) { return <article><span>{icon}</span><h3>{title}</h3><p>{text}</p></article>; }
+function Navigation({back, next, nextLabel, disabled = false}: {back: () => void; next: () => void; nextLabel: string; disabled?: boolean}) { const t = useTranslations('common'); return <div className="navigation-row"><button className="nav-back" onClick={back}><ArrowLeft className="rtl-flip h-4 w-4" /> {t('back')}</button><button className="button-primary" onClick={next} disabled={disabled}><span>{nextLabel}</span><ArrowRight className="rtl-flip h-4 w-4" /></button></div>; }
+function Footer() { const locale = useLocale() as Locale; const disclaimer = locale === 'ar' ? 'إرشاد تجميلي فقط — وليس تشخيصاً طبياً' : locale === 'fr' ? 'Conseils cosmétiques uniquement — aucun diagnostic médical' : 'Cosmetic guidance only — no medical diagnosis'; return <footer className="site-footer"><div><BrandMark inverse /><span>{disclaimer}</span></div><a href="https://www.carimoempire.com/shop/" target="_blank" rel="noreferrer">carimoempire.com <ExternalLink className="h-3.5 w-3.5" /></a></footer>; }
 
 export function SkinMatchDemo() {
-  const locale = useLocale();
-  const [stage, setStage] = useState<Stage>('landing');
+  const [stage, setStage] = useState<Stage>('welcome');
   const [photo, setPhoto] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Answers>(defaultAnswers);
   const [source, setSource] = useState('photo-and-questionnaire');
-
-  function reset() { setStage('landing'); setPhoto(null); setAnswers(defaultAnswers); }
-  function skipToQuestions() { setPhoto(null); setStage('questions'); }
-
-  async function analyze() {
-    setStage('analyzing');
-    try {
-      const response = await fetch('/api/analyze', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({answers, hasPhoto: Boolean(photo)})});
-      const data = await response.json();
-      setSource(data.source || 'questionnaire-only');
-    } catch {
-      setSource('questionnaire-only');
-    }
-    setTimeout(() => setStage('results'), 1700);
-  }
-
-  return (
-    <div className="min-h-screen">
-      <Header reset={reset} />
-      <Progress stage={stage} />
-      {stage === 'landing' && <Landing start={() => setStage('consent')} skipPhoto={skipToQuestions} />}
-      {stage === 'consent' && <Consent back={() => setStage('landing')} next={() => setStage('capture')} />}
-      {stage === 'capture' && <Capture back={() => setStage('consent')} next={() => setStage('questions')} skip={skipToQuestions} photo={photo} setPhoto={setPhoto} />}
-      {stage === 'questions' && <Questions answers={answers} setAnswers={setAnswers} back={() => setStage(photo ? 'capture' : 'landing')} next={analyze} />}
-      {stage === 'analyzing' && <Analyzing hasPhoto={Boolean(photo)} />}
-      {stage === 'results' && <Results answers={answers} reset={reset} source={source} />}
-      <footer className="mt-8 border-t border-[#2b2b2b] bg-[#0d0d0d] text-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-8 text-center text-xs text-white/60 md:flex-row md:px-8 md:text-start">
-          <div className="flex items-center gap-3"><Crown className="h-5 w-5 text-[#d8bd72]" /><span className="font-bold uppercase tracking-[.12em] text-white">CARIMO SkinMatch AI</span><span className="text-[#d1007f]">·</span><span>Concept demo</span></div>
-          <span>{locale === 'ar' ? 'إرشادات تجميلية وليست تشخيصاً طبياً' : locale === 'fr' ? 'Conseils cosmétiques — pas un diagnostic médical' : 'Cosmetic guidance — not a medical diagnosis'}</span>
-        </div>
-      </footer>
-    </div>
-  );
+  useEffect(() => () => { if (photo?.startsWith('blob:')) URL.revokeObjectURL(photo); }, [photo]);
+  function reset() { setStage('welcome'); setPhoto(null); setAnswers(defaultAnswers); setSource('photo-and-questionnaire'); }
+  function skipToConsultation() { setPhoto(null); setStage('consultation'); }
+  async function analyze() { setStage('atelier'); const started = Date.now(); try { const response = await fetch('/api/analyze', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({answers, hasPhoto: Boolean(photo)})}); const data = await response.json(); setSource(data.source || 'questionnaire-only'); } catch { setSource('questionnaire-only'); } const remaining = Math.max(0, 2600 - (Date.now() - started)); window.setTimeout(() => setStage('reveal'), remaining); }
+  return <div className="luxury-app"><div className="ambient-grain" /><Header reset={reset} stage={stage} /><AnimatePresence mode="wait"><PageTransition stage={stage}>{stage === 'welcome' && <Welcome start={() => setStage('privacy')} skip={skipToConsultation} />}{stage === 'privacy' && <Privacy back={() => setStage('welcome')} next={() => setStage('portrait')} />}{stage === 'portrait' && <Portrait back={() => setStage('privacy')} next={() => setStage('consultation')} skip={skipToConsultation} photo={photo} setPhoto={setPhoto} />}{stage === 'consultation' && <Consultation answers={answers} setAnswers={setAnswers} back={() => setStage(photo ? 'portrait' : 'welcome')} next={analyze} />}{stage === 'atelier' && <Atelier hasPhoto={Boolean(photo)} />}{stage === 'reveal' && <Reveal answers={answers} reset={reset} source={source} />}</PageTransition></AnimatePresence>{stage !== 'atelier' && <Footer />}</div>;
 }
