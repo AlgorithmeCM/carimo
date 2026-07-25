@@ -1,0 +1,41 @@
+{
+  "common": {"demoBadge":"Démo conceptuelle interactive","back":"Retour"},
+  "landing": {
+    "eyebrow":"Conseils beauté assistés par IA",
+    "title":"Découvrez la routine CARIMO pensée pour <highlight>votre peau</highlight>",
+    "subtitle":"Prenez une photo, répondez à quelques questions et découvrez une routine beauté personnalisée et immédiatement achetable.",
+    "primary":"Analyser ma peau","secondary":"Continuer sans photo","private":"Photo non conservée durablement","nonMedical":"Conseils cosmétiques uniquement","minutes":"Prête en moins de 2 minutes","livePreview":"Aperçu en direct","hydration":"Hydratation","shine":"Brillance","match":"Compatibilité","personalMatch":"Votre sélection personnalisée","threeLanguages":"English · العربية · Français"
+  },
+  "consent": {
+    "title":"Votre confidentialité avant tout","subtitle":"Avant d’ouvrir la caméra, découvrez comment fonctionne cette analyse beauté.",
+    "temporary":"J’accepte le traitement temporaire de ma photo pour une analyse beauté cosmétique.",
+    "nonDiagnostic":"Je comprends que cette expérience ne fournit aucun diagnostic ni aucune prescription médicale.",
+    "recommendations":"J’accepte de recevoir des recommandations de produits cosmétiques selon mes réponses.",
+    "privacyTitle":"Confidentialité dès la conception","privacyText":"La démo supprime les métadonnées, n’effectue aucune reconnaissance faciale et n’utilise pas votre photo pour entraîner un modèle.","continue":"Continuer vers la caméra"
+  },
+  "capture": {
+    "title":"Prenez une photo claire et naturelle","subtitle":"Une bonne photo améliore la personnalisation des conseils cosmétiques. Vous pouvez aussi utiliser uniquement le questionnaire.",
+    "takeOrUpload":"Prendre ou importer une photo","tip":"Regardez la caméra sous une lumière naturelle ou blanche, sans filtre beauté.","light":"Bonne lumière","center":"Visage centré","noFilter":"Sans filtre prononcé","skip":"Continuer sans photo","usePhoto":"Utiliser cette photo","previewAlt":"Aperçu du visage sélectionné","qualityPass":"La qualité de la photo semble bonne"
+  },
+  "questions": {
+    "step":"Question {current} sur {total}","next":"Question suivante","build":"Créer ma routine","medicalNotice":"En cas d’affection diagnostiquée, demandez conseil à un professionnel de santé avant d’introduire de nouveaux produits.",
+    "feel":{"title":"Comment votre peau se sent-elle généralement après le nettoyage ?","options":{"comfortable":"Confortable","dry":"Tendue ou sèche","oily":"Grasse","combination":"Différente selon les zones"}},
+    "shine":{"title":"En combien de temps votre visage devient-il brillant ?","options":{"rarely":"Rarement","hours":"Après plusieurs heures","quickly":"Très rapidement","areas":"Seulement sur certaines zones"}},
+    "sensitivity":{"title":"Votre peau réagit-elle souvent aux nouveaux produits ?","options":{"rarely":"Rarement","sometimes":"Parfois","frequent":"Fréquemment","diagnosed":"J’ai une affection cutanée diagnostiquée"}},
+    "concern":{"title":"Que souhaitez-vous principalement améliorer ?","options":{"dryness":"Sécheresse","dullness":"Manque d’éclat","tone":"Teint d’apparence irrégulière","spots":"Taches ou marques visibles","blemishes":"Imperfections","shine":"Brillance excessive","lines":"Ridules","maintenance":"Entretien quotidien"}},
+    "climate":{"title":"Quel environnement décrit le mieux votre quotidien ?","options":{"hot-humid":"Chaud et humide","hot-dry":"Chaud et sec","air-conditioned":"Très climatisé","sun":"Forte exposition solaire","mild":"Climat doux","cold-dry":"Climat froid ou sec"}},
+    "texture":{"title":"Quelle texture préférez-vous généralement ?","options":{"lightweight":"Légère","rich":"Riche et nourrissante","none":"Aucune préférence"}},
+    "routine":{"title":"Quel niveau de routine souhaitez-vous ?","options":{"essential":"Essentielle — 2 à 3 produits","complete":"Complète — 4 produits","ritual":"Rituel CARIMO — 5 produits"}}
+  },
+  "analysis": {"title":"Création de votre sélection CARIMO","subtitle":"Nous combinons vos objectifs beauté, votre environnement et vos préférences.","quality":"Vérification de la qualité de la photo","visible":"Observation des préoccupations beauté visibles","answers":"Compréhension de vos réponses","matching":"Recherche des produits CARIMO","building":"Création de votre routine personnalisée"},
+  "results": {
+    "profile":"Votre profil beauté","profileTitle":"Votre CARIMO SkinMatch est prêt","summary":"Votre routine donne la priorité à {concern}, tout en tenant compte de votre environnement {climate} et de votre confort quotidien.","questionnaireOnly":"Personnalisé grâce à votre questionnaire","photoAndAnswers":"Personnalisé grâce à votre photo et vos réponses","hydrationNeed":"Besoin d’hydratation","visibleShine":"Brillance visible","uneven":"Apparence irrégulière","declaredSensitivity":"Sensibilité déclarée","routineEyebrow":"Découverte personnalisée des produits","routineTitle":"Choisissez votre routine","estimatedTotal":"Total estimatif des produits","restart":"Recommencer","shopRoutine":"Explorer la boutique CARIMO","viewProduct":"Voir le produit officiel","reason":"Sélectionné pour accompagner {concern} et correspondre à un quotidien {climate}.",
+    "levels":{"low":"Faible","moderate":"Modéré","high":"Élevé"},
+    "sensitivity":{"rarely":"Faible","sometimes":"Modérée","frequent":"Élevée","diagnosed":"Conseil professionnel"},
+    "tiers":{"essential":"Essentielle","complete":"Complète","ritual":"Rituel CARIMO"},
+    "steps":{"cleanse":"Nettoyer","target":"Cibler","hydrate":"Hydrater","protect":"Protéger","ritual":"Rituel complet"},
+    "concerns":{"dryness":"la sécheresse","dullness":"le manque d’éclat","tone":"un teint d’apparence plus uniforme","spots":"les taches et marques visibles","blemishes":"les imperfections visibles","shine":"la brillance excessive","lines":"les ridules","maintenance":"l’entretien quotidien"},
+    "climates":{"hot-humid":"chaud et humide","hot-dry":"chaud et sec","air-conditioned":"très climatisé","sun":"fortement exposé au soleil","mild":"au climat doux","cold-dry":"froid ou sec"},
+    "trust":{"privateTitle":"Confidentiel dès la conception","privateText":"La démo repose sur un traitement temporaire des photos et la minimisation des données.","guidanceTitle":"Cosmétique, non médical","guidanceText":"Les résultats décrivent des préoccupations beauté et ne prétendent jamais diagnostiquer une affection.","personalTitle":"Sélections expliquées","personalText":"Chaque produit est relié à l’objectif, à l’environnement et à la préférence ayant motivé sa sélection."}
+  }
+}

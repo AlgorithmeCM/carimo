@@ -1,0 +1,41 @@
+{
+  "common": {"demoBadge":"Interactive concept demo","back":"Back"},
+  "landing": {
+    "eyebrow":"AI-powered beauty guidance",
+    "title":"Meet the CARIMO routine made for <highlight>your skin</highlight>",
+    "subtitle":"Take a photo, answer a few questions and discover a personalized, immediately shoppable beauty routine.",
+    "primary":"Analyze my skin","secondary":"Continue without a photo","private":"Photo not permanently stored","nonMedical":"Cosmetic guidance only","minutes":"Ready in under 2 minutes","livePreview":"Live preview","hydration":"Hydration","shine":"Shine","match":"Match","personalMatch":"Your personalized match","threeLanguages":"English · العربية · Français"
+  },
+  "consent": {
+    "title":"Your privacy comes first","subtitle":"Before opening the camera, please review how this beauty analysis works.",
+    "temporary":"I agree to the temporary processing of my photo for a cosmetic beauty analysis.",
+    "nonDiagnostic":"I understand that this experience does not provide a medical diagnosis or prescription.",
+    "recommendations":"I agree to receive cosmetic product recommendations based on my answers.",
+    "privacyTitle":"Privacy by design","privacyText":"The demo removes image metadata, does not perform facial recognition and does not use your photo to train a model.","continue":"Continue to camera"
+  },
+  "capture": {
+    "title":"Take a clear, natural photo","subtitle":"A good photo helps us personalize the cosmetic guidance. You can also continue with the questionnaire only.",
+    "takeOrUpload":"Take or upload a photo","tip":"Face the camera in natural or white light, without a beauty filter.","light":"Good light","center":"Face centered","noFilter":"No strong filter","skip":"Continue without a photo","usePhoto":"Use this photo","previewAlt":"Selected face preview","qualityPass":"Photo quality looks good"
+  },
+  "questions": {
+    "step":"Question {current} of {total}","next":"Next question","build":"Build my routine","medicalNotice":"For a diagnosed condition, speak with a qualified healthcare professional before introducing new products.",
+    "feel":{"title":"How does your skin usually feel after cleansing?","options":{"comfortable":"Comfortable","dry":"Tight or dry","oily":"Oily","combination":"Different depending on the area"}},
+    "shine":{"title":"How quickly does your face become shiny?","options":{"rarely":"Rarely","hours":"After several hours","quickly":"Very quickly","areas":"Only in some areas"}},
+    "sensitivity":{"title":"How often does your skin react to new products?","options":{"rarely":"Rarely","sometimes":"Sometimes","frequent":"Frequently","diagnosed":"I have a diagnosed skin condition"}},
+    "concern":{"title":"What would you most like to improve?","options":{"dryness":"Dryness","dullness":"Dull-looking skin","tone":"Uneven-looking tone","spots":"Visible spots or marks","blemishes":"Blemishes","shine":"Excess shine","lines":"Fine lines","maintenance":"General maintenance"}},
+    "climate":{"title":"Which environment best describes your daily life?","options":{"hot-humid":"Hot and humid","hot-dry":"Hot and dry","air-conditioned":"Frequently air-conditioned","sun":"Strong sun exposure","mild":"Mild climate","cold-dry":"Cold or dry climate"}},
+    "texture":{"title":"Which texture do you usually prefer?","options":{"lightweight":"Lightweight","rich":"Rich and nourishing","none":"No preference"}},
+    "routine":{"title":"How complete should your routine be?","options":{"essential":"Essential — 2 to 3 products","complete":"Complete — 4 products","ritual":"CARIMO Ritual — 5 products"}}
+  },
+  "analysis": {"title":"Creating your CARIMO match","subtitle":"We are combining your beauty goals, environment and preferences.","quality":"Checking photo quality","visible":"Reviewing visible beauty concerns","answers":"Understanding your answers","matching":"Matching CARIMO products","building":"Building your personalized routine"},
+  "results": {
+    "profile":"Your beauty profile","profileTitle":"Your CARIMO SkinMatch is ready","summary":"Your routine prioritizes {concern}, while considering your {climate} environment and daily comfort.","questionnaireOnly":"Personalized from your questionnaire","photoAndAnswers":"Personalized from your photo and answers","hydrationNeed":"Hydration need","visibleShine":"Visible shine","uneven":"Uneven-looking appearance","declaredSensitivity":"Declared sensitivity","routineEyebrow":"Personalized product discovery","routineTitle":"Choose your routine","estimatedTotal":"Estimated product total","restart":"Start again","shopRoutine":"Explore the CARIMO shop","viewProduct":"View official product","reason":"Selected to support {concern} and fit a {climate} lifestyle.",
+    "levels":{"low":"Low","moderate":"Moderate","high":"High"},
+    "sensitivity":{"rarely":"Low","sometimes":"Moderate","frequent":"High","diagnosed":"Professional guidance"},
+    "tiers":{"essential":"Essential","complete":"Complete","ritual":"CARIMO Ritual"},
+    "steps":{"cleanse":"Cleanse","target":"Target","hydrate":"Hydrate","protect":"Protect","ritual":"Full ritual"},
+    "concerns":{"dryness":"dryness","dullness":"dull-looking skin","tone":"a more even-looking tone","spots":"visible spots and marks","blemishes":"visible blemishes","shine":"excess shine","lines":"fine lines","maintenance":"daily maintenance"},
+    "climates":{"hot-humid":"hot and humid","hot-dry":"hot and dry","air-conditioned":"highly air-conditioned","sun":"sun-exposed","mild":"mild-climate","cold-dry":"cold or dry"},
+    "trust":{"privateTitle":"Private by design","privateText":"The demo is designed around temporary photo processing and data minimization.","guidanceTitle":"Cosmetic, not medical","guidanceText":"Results describe beauty concerns and never claim to diagnose a skin condition.","personalTitle":"Explainable matches","personalText":"Every product is linked to the goal, environment and preference that supported its selection."}
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "CARIMO SkinMatch AI",
+  "short_name": "SkinMatch",
+  "start_url": "/en",
+  "display": "standalone",
+  "background_color": "#fffaf5",
+  "theme_color": "#6d263f",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

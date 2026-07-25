@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --carimo-black: #0d0d0d;
+  --carimo-ink: #171717;
+  --carimo-muted: #6d6962;
+  --carimo-gold: #c9a64e;
+  --carimo-gold-dark: #9a761f;
+  --carimo-magenta: #d1007f;
+  --carimo-magenta-dark: #a90067;
+  --carimo-ivory: #fbfaf7;
+  --carimo-sand: #f3efe7;
+  --carimo-border: #e7e0d4;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--carimo-ink);
+  background:
+    linear-gradient(180deg, rgba(201,166,78,.055), transparent 22rem),
+    var(--carimo-ivory);
+}
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+::selection { color: white; background: var(--carimo-magenta); }
+
+.glass {
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(231,224,212,.96);
+}
+
+.mesh {
+  background-image:
+    linear-gradient(rgba(201,166,78,.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,166,78,.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+.brand-product-grid {
+  background-image:
+    radial-gradient(circle at 18% 15%, rgba(201,166,78,.17), transparent 12rem),
+    linear-gradient(rgba(13,13,13,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,13,13,.025) 1px, transparent 1px);
+  background-size: auto, 28px 28px, 28px 28px;
+}
+
+.gold-text {
+  color: #b88b29;
+  background-image: linear-gradient(110deg, #875d0b 0%, #d7bd6f 48%, #9a6d14 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.carimo-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,166,78,.9), transparent);
+}
+
+.scan-line { animation: scan 2.2s ease-in-out infinite; }
+@keyframes scan {
+  0%,100% { transform: translateY(-70px); opacity:.16; }
+  50% { transform: translateY(80px); opacity:.95; }
+}
+
+[dir='rtl'] .rtl-flip { transform: scaleX(-1); }
