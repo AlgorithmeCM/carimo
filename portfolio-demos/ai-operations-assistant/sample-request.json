@@ -1,0 +1,8 @@
+{
+  "from": "Nadia",
+  "customerTier": "VIP",
+  "channel": "email",
+  "subject": "Urgent: shipment has not arrived",
+  "message": "Our shipment was expected yesterday and the customer is threatening to cancel the order. Please confirm where the cargo is and when it will arrive.",
+  "department": "Customer Service"
+}
